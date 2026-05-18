@@ -463,6 +463,8 @@ class Sprinkler : public Component {
   /// log error message when a method is called but multiplier is zero
   void log_multiplier_zero_warning_(const LogString *method_name);
 
+  void log_zero_valves_enabled_warning_(const LogString *method_name);
+
   /// return the specified SprinklerValveRunRequestOrigin as a string
   const LogString *req_as_str_(SprinklerValveRunRequestOrigin origin);
 

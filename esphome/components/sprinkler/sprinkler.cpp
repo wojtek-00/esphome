@@ -757,6 +757,13 @@ void Sprinkler::start_full_cycle() {
     this->log_multiplier_zero_warning_(LOG_STR("start_full_cycle"));
     return;
   }
+
+  if (!this->any_valve_is_enabled_()) {
+    this->log_zero_valves_enabled_warning_(LOG_STR("start_full_cycle"));
+    return;
+  }
+
+  
   if (this->auto_advance() && this->active_valve().has_value()) {
     return;  // if auto-advance is already enabled and there is already a valve running, do nothing
   }
@@ -1384,15 +1391,6 @@ void Sprinkler::all_valves_off_(const bool include_pump) {
 void Sprinkler::prep_full_cycle_() {
   this->set_auto_advance(true);
 
-  if (!this->any_valve_is_enabled_()) {
-    for (auto &valve : this->valve_) {
-      if (valve.enable_switch != nullptr) {
-        if (!valve.enable_switch->state) {
-          valve.enable_switch->turn_on();
-        }
-      }
-    }
-  }
   this->reset_cycle_states_();
 }
 
@@ -1550,6 +1548,10 @@ void Sprinkler::log_standby_warning_(const LogString *method_name) {
 
 void Sprinkler::log_multiplier_zero_warning_(const LogString *method_name) {
   ESP_LOGW(TAG, "%s called but multiplier is set to zero; no action taken", LOG_STR_ARG(method_name));
+}
+
+void Sprinkler::log_zero_valves_enabled_warning_(const LogString *method_name) {
+  ESP_LOGW(TAG, "%s called but enabled valves number is zero; no action taken", LOG_STR_ARG(method_name));
 }
 
 // Request origin strings indexed by SprinklerValveRunRequestOrigin enum (0-2): USER, CYCLE, QUEUE
